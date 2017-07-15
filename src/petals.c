@@ -37,7 +37,6 @@
  * ============================================================================
  */
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -64,12 +63,16 @@ typedef uint64_t Cup;
 void
 print_rules() {
     static char *rules = 
-    "===================================================================\n\n"
+    "===================================================================\n"
+    "\n"
     "Welcome to Petals Around the Rose. In this game you will be shown\n"
     "the result of %d die rolls. You will then be shown an \"answer\".\n"
-    "Your goal is to figure out why the answer is correct for the given\n"
-    "configuration of die rolls.\n\nGood luck!!!\n\n"
-    "===================================================================\n\n";
+    "Your goal is to figure out how the answer relates to the die rolls.\n"
+    "\n"
+    "Good luck!!!\n"
+    "\n"
+    "===================================================================\n"
+    "\n";
 
     printf(rules, NUM_DICE);
 }
@@ -210,13 +213,15 @@ main( int argc, char *argv[] ) {
 
     /* initialize the random number generator */
     srand(time(NULL));
+
+    /* greet the player */
     print_rules();
 
-    /* wait for user to start the game */
+    /* wait for player to start the game */
     printf("Press Enter to begin");
     while (fgetc(stdin) != '\n' && !feof(stdin)); 
 
-    /* play until user quits */
+    /* play until player quits */
     while( q == ROLL ) {
         /* play the game */
         play_petals();  
