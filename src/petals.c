@@ -48,11 +48,10 @@
 #define DICE_PER_ROW 5 /* number of dice to be rendered per console row */
 
 /* helper macro for extracting indexed die from Cup */
-#define READ_DIE( c, i ) ((int)((((c) >> 3*(i))%6) + 1))
+#define READ_DIE(c, i) ((int)((((c) >> 3 * (i)) % 6) + 1))
 
 /* Cup capable of holding up to 21 six-sided dice (3 bits per die) */
 typedef uint64_t Cup;
-
 
 /* 
  * ===  FUNCTION  =============================================================
@@ -61,7 +60,7 @@ typedef uint64_t Cup;
  * ============================================================================
  */
 void
-print_rules() {
+print_rules(void) {
     static char *rules = 
     "===================================================================\n"
     "\n"
@@ -74,7 +73,7 @@ print_rules() {
     "===================================================================\n"
     "\n";
 
-    printf(rules, NUM_DICE);
+    fprintf(stdout, rules, NUM_DICE);
 }
 
 
@@ -88,64 +87,64 @@ print_rules() {
  * ============================================================================
  */
 void
-render ( Cup c, int n) {
+render(Cup c, int n) {
     int i, j, d;
 
     /* loop to control number of dice per row */
-    for( j=0; j<n; j+=DICE_PER_ROW) {
-        printf("\n");
+    for (j = 0; j < n; j += DICE_PER_ROW) {
+        fprintf(stdout, "\n");
         
         /* top line above dice */
-        for( i=j; i<j+DICE_PER_ROW && i<n; i++ ) {
-            printf(" -------     ");
+        for (i = j; i < j + DICE_PER_ROW && i < n; i++) {
+            fprintf(stdout, " -------     ");
         }
-        printf("\n");
+        fprintf(stdout, "\n");
         
         /* print first row of dots for each dice */
-        for( i=j; i<j+DICE_PER_ROW && i<n; i++ ) {
+        for (i = j; i < j + DICE_PER_ROW && i < n; i++) {
             d = READ_DIE(c, i);
-            printf("| %c   %c |    ", 
-                (d==1||d==3)? ' ' : '*', 
-                (d<3)? ' ' : '*'
+            fprintf(stdout, "| %c   %c |    ", 
+                (d == 1 || d == 3)? ' ' : '*', 
+                (d < 3)? ' ' : '*'
             );
         }
-        printf("\n");
+        fprintf(stdout, "\n");
         
         /* print second row of dots for each dice */
-        for( i=j; i<j+DICE_PER_ROW && i<n; i++ ) {
+        for (i = j; i < j + DICE_PER_ROW && i < n; i++) {
             d = READ_DIE(c, i);
-            printf("| %c %c %c |    ", 
-                (d==6)? '*' : ' ', 
-                (d%2)? '*' : ' ', 
-                (d==6)? '*' : ' '
+            fprintf(stdout, "| %c %c %c |    ", 
+                (d == 6)? '*' : ' ', 
+                (d % 2)? '*' : ' ', 
+                (d == 6)? '*' : ' '
             );
         }
-        printf("\n");
+        fprintf(stdout, "\n");
         
         /* print third row of dots for each dice */
-        for( i=j; i<j+DICE_PER_ROW && i<n; i++ ) {
+        for (i = j; i < j + DICE_PER_ROW && i < n; i++) {
             d = READ_DIE(c, i);
-            printf("| %c   %c |    ", 
-                (d>2)? '*' : ' ', 
-                (d==1||d==3)? ' ' : '*'
+            fprintf(stdout, "| %c   %c |    ", 
+                (d > 2)? '*' : ' ', 
+                (d == 1 || d == 3)? ' ' : '*'
             );
         }
-        printf("\n");
+        fprintf(stdout, "\n");
         
         /* bottom line beneath dice */
-        for( i=j; i<j+DICE_PER_ROW && i<n; i++ ) {
-            printf(" -------     ");
+        for (i = j; i < j + DICE_PER_ROW && i < n; i++) {
+            fprintf(stdout, " -------     ");
         }
-        printf("\n");
+        fprintf(stdout, "\n");
         
         /* generally not a bad idea to just print the dice values too */
-        for( i=j; i<j+DICE_PER_ROW && i<n; i++ ) {
+        for (i = j; i < j + DICE_PER_ROW && i < n; i++) {
             d = READ_DIE(c, i);
-            printf("%5d        ", d );
+            fprintf(stdout, "%5d        ", d);
         }
         
         /* big line break to distinguish between rows */
-        printf("\n\n");
+        fprintf(stdout, "\n\n");
     }   
 }
 
@@ -159,16 +158,20 @@ render ( Cup c, int n) {
  * ============================================================================
  */
 int
-answer ( Cup c, int n ) {
+answer(Cup c, int n) {
     int d, i, s;
     
     /* initialize sum */
     s = 0;
 
     /* answer is sum of three rolls times two and five rolls times four. */
-    for( i=0; i<n; i++ ) {
-        d = READ_DIE( c, i );
-        s += (d-1)*(d%2);
+    for (i = 0; i < n; i++) {
+        d = READ_DIE(c, i);
+        /* Value of petals is the value of the rose minus one             */
+        /* i.e. 1 is worth 0, 3 is worth 2 and 5 is worth 4 -- hence d-1. */
+        /* Only odd numbers count so multiply by d mod 2.                 */
+        /* This drives even numbers to zero.                              */
+        s += (d - 1) * (d % 2);
     }
 
     /* return the answer */
@@ -183,21 +186,21 @@ answer ( Cup c, int n ) {
  * ============================================================================
  */
 void
-play_petals() {
+play_petals(void) {
     Cup c;
     
     /* roll all dice */
     c = rand();
 
     /* display dice for our users */
-    render( c, NUM_DICE );
+    render(c, NUM_DICE);
 
     /* wait for player to request the answer */
-    printf("Press Enter to reveal answer ");
+    fprintf(stdout, "Press Enter to reveal answer ");
     while (fgetc(stdin) != '\n' && !feof(stdin)); 
 
     /* print the answer and pitch the big question */
-    printf("The answer is: %d -- but why???\n\n", answer(c, NUM_DICE));
+    fprintf(stdout, "The answer is: %d -- but why???\n\n", answer(c, NUM_DICE));
 }
 
 
@@ -208,7 +211,7 @@ play_petals() {
  * ============================================================================
  */
 int
-main( int argc, char *argv[] ) {
+main(int argc, char *argv[]) {
     char q = ROLL;
 
     /* initialize the random number generator */
@@ -218,16 +221,16 @@ main( int argc, char *argv[] ) {
     print_rules();
 
     /* wait for player to start the game */
-    printf("Press Enter to begin");
+    fprintf(stdout, "Press Enter to begin");
     while (fgetc(stdin) != '\n' && !feof(stdin)); 
 
     /* play until player quits */
-    while( q == ROLL ) {
+    while (q == ROLL) {
         /* play the game */
         play_petals();  
         
         /* give player a chance to go again */
-        printf("Play again? y/n: ");
+        fprintf(stdout, "Play again? y/n: ");
         q = fgetc(stdin);
         
         /* clear input buffer */
